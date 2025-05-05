@@ -1,5 +1,23 @@
 import numpy as np
 
+
+"""Solves x in Ax=b using Krylov and Built in method, takes the 
+magnitude of the error and prints it.
+
+Also returns the numpy solved and the CG generated vec
+as a tuple of 2 elements 
+"""
+def solve(A,b):
+    result = efficient_conjugate_gradient(A,b,0.05)
+    #using built in solver 
+    preciseRes = np.linalg.solve(A,b)
+    e = preciseRes-result 
+    print("----"*50)
+    print(f"Rounded error: {np.dot(e,e):.5f}")
+    print("----"*50)
+
+    return (result,preciseRes)
+
 """Computes R^2 error between 2 vectors"""
 def compute_error(x1,x2):
     e = x1-x2
@@ -15,7 +33,7 @@ t - int, threshold value for error
 def efficient_conjugate_gradient(A,b, t : float):
     x = np.zeros((A.shape[0],))
     d = r = b 
-    while(not np.dot(r,r)<t):
+    while(not np.dot(r,np.matmul(A,r))<t):
         aProdD = np.matmul(A,d)
         a = np.dot(r,r)/np.dot(d,aProdD)
         x = x + a*d
@@ -27,7 +45,8 @@ def efficient_conjugate_gradient(A,b, t : float):
         r=rNew
 
     #when r becomes zero, we are done, we have minimized r. 
-    return x 
+    return x
+ 
 """Takes in a positive definite matrix A, and a vector B
 where A is in
 Precisely computes to the full answer doesn't end at an approximation  
@@ -36,8 +55,7 @@ def full_conjugate_gradient(A, b):
     #we take x^(0) to be 0 here
     x = zero = np.zeros((A.shape[0],))
     d = r = b 
-    for i in range(5):
-    #while(not np.array_equal(r,zero)):
+    while(not np.array_equal(r,zero)):
         aProdD = np.matmul(A,d)
         a = np.dot(r,r)/np.dot(d,aProdD)
         x = x + a*d
@@ -50,7 +68,6 @@ def full_conjugate_gradient(A, b):
 
     #when r becomes zero, we are done, we have minimized r. 
     return x 
-
 
 
 """Normalize vector"""
